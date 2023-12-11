@@ -64,6 +64,16 @@
           color="negative"
           icon="stop"
           @click="$emit('stop', props.row.id)"
+          v-if="!props.row.endDate"
+        />
+        <q-btn
+          dense
+          flat
+          rounded
+          color="positive"
+          icon="play_arrow"
+          @click="$emit('restart', props.row.id)"
+          v-else
         />
         <q-btn
           dense
@@ -96,7 +106,7 @@ const props = defineProps({
   },
 });
 
-defineEmits(['edit', 'save', 'stop', 'remove']);
+defineEmits(['edit', 'save', 'stop', 'remove', 'restart']);
 
 let intervalRef;
 const durations = ref([]);

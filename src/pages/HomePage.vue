@@ -41,6 +41,7 @@
       @save="saveActivity"
       @stop="stopActivity"
       @remove="openRemoveActivityDialog"
+      @restart="restartActivity"
     />
   </q-page>
 </template>
@@ -63,6 +64,8 @@ let reloadEventSubscription;
 
 function search() {
   loading.value = true;
+  filters.order = 'startDate';
+  filters.sort = 'desc';
 
   activityService.find(filters)
     .then((response) => {
@@ -114,6 +117,24 @@ async function stopActivity(activityId) {
   await activityService.update(activity);
   search();
 }
+
+async function restartActivity(activityId) {
+  const lastActivity = activities.value.find(({ endDate }) => !endDate);
+  if (lastActivity) {
+    await stopActivity(lastActivity.id);
+  }
+
+  const activity = activities.value.find(({ id }) => id === activityId);
+  await activityService.create({
+    ...activity,
+    id: undefined,
+    startDate: Date.now(),
+    endDate: undefined,
+    tags: activity.tags.map(({ id }) => id),
+  });
+  search();
+}
+
 onMounted(() => {
   reloadEventSubscription = Events.ReloadActivitiesEvent.subscribe(search);
   search();
