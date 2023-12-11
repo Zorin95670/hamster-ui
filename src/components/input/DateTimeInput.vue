@@ -1,58 +1,66 @@
 <template>
-  <div class="flex row items-center">
-    <input
-      ref="inputYear"
-      type="number"
-      class="size4"
-      v-model.number="year"
-      :min="1900"
-      :max="2100"
-      @click="$refs.inputYear.select()"
-      @input="onChange"
-    />
-    <span class="date-text q-mx-xs">/</span>
-    <input
-      ref="inputMonth"
-      type="number"
-      class="size2"
-      v-model.number="month"
-      :min="1"
-      :max="12"
-      @click="$refs.inputMonth.select()"
-      @input="onChange"
-    />
-    <span class="date-text q-mx-xs">/</span>
-    <input
-      ref="inputDay"
-      type="number"
-      class="size2"
-      v-model.number="day"
-      :min="1"
-      :max="maxMonth"
-      @click="$refs.inputDay.select()"
-      @input="onChange"
-    />
-    <input
-      ref="inputHour"
-      type="number"
-      class="size2 q-ml-md"
-      v-model.number="hour"
-      :min="0"
-      :max="23"
-      @click="$refs.inputHour.select()"
-      @input="onChange"
-    />
-    <span class="date-text q-mx-xs">:</span>
-    <input
-      ref="inputMinute"
-      type="number"
-      class="size2"
-      v-model.number="minute"
-      :min="0"
-      :max="59"
-      @click="$refs.inputMinute.select()"
-      @input="onChange"
-    />
+  <div class="flex column">
+    <label
+      v-if="label"
+      class="q-field__label"
+    >
+      {{ label }}
+    </label>
+    <div class="flex row items-center">
+      <input
+        ref="inputYear"
+        type="number"
+        class="size4"
+        v-model.number="year"
+        :min="1900"
+        :max="2100"
+        @click="$refs.inputYear.select()"
+        @input="onChange"
+      />
+      <span class="date-text q-mx-xs">/</span>
+      <input
+        ref="inputMonth"
+        type="number"
+        class="size2"
+        v-model.number="month"
+        :min="1"
+        :max="12"
+        @click="$refs.inputMonth.select()"
+        @input="onChange"
+      />
+      <span class="date-text q-mx-xs">/</span>
+      <input
+        ref="inputDay"
+        type="number"
+        class="size2"
+        v-model.number="day"
+        :min="1"
+        :max="maxMonth"
+        @click="$refs.inputDay.select()"
+        @input="onChange"
+      />
+      <input
+        ref="inputHour"
+        type="number"
+        class="size2 q-ml-md"
+        v-model.number="hour"
+        :min="0"
+        :max="23"
+        @click="$refs.inputHour.select()"
+        @input="onChange"
+      />
+      <span class="date-text q-mx-xs">:</span>
+      <input
+        ref="inputMinute"
+        type="number"
+        class="size2"
+        v-model.number="minute"
+        :min="0"
+        :max="59"
+        @click="$refs.inputMinute.select()"
+        @input="onChange"
+      />
+    </div>
   </div>
 </template>
 
@@ -73,6 +81,9 @@ const props = defineProps({
   modelValue: {
     type: Number,
     required: true,
+  },
+  label: {
+    type: String,
   },
 });
 const emits = defineEmits(['update:model-value']);

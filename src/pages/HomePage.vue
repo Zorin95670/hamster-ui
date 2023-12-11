@@ -34,11 +34,10 @@
         />
       </q-card-section>
     </q-card>
-    <activity-table
+    <activity-list
+      style="max-width: 800px;"
       :activities="activities"
-      :loading="loading"
       @edit="openAddActivityDialog"
-      @save="saveActivity"
       @stop="stopActivity"
       @remove="openRemoveActivityDialog"
       @restart="restartActivity"
@@ -48,11 +47,12 @@
 
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue';
-import ActivityTable from 'components/table/ActivityTable.vue';
 import TagSelect from 'components/select/TagSelect.vue';
 import * as activityService from 'src/services/ActivityService.js';
 import Events from 'src/composables/Events';
 import DayTrackingImage from 'components/image/DayTrackingImage.vue';
+import ActivityList from 'components/list/ActivityList.vue';
+import { sanitizeDate } from 'src/composables/Sanitize';
 
 const activities = ref([]);
 const loading = ref(true);
@@ -78,8 +78,8 @@ function search() {
 }
 
 function onFilter() {
-  filters.name = filterName.value.length > 0 ? `lk_*${filterName.value}*` : null;
-  filters.tags = filterTags.value.length > 0 ? `lk_*${filterTags.value.map(({ id }) => id).join(',')}*` : null;
+  filters.name = (filterName.value?.length || 0) > 0 ? `lk_*${filterName.value}*` : null;
+  filters.tags = filterTags.value.length > 0 ? filterTags.value.map(({ id }) => `lk_*${id}*`).join('|') : null;
 
   search();
 }
@@ -104,16 +104,9 @@ function openRemoveActivityDialog(activityId) {
   });
 }
 
-async function saveActivity(activityId) {
-  loading.value = true;
-  const activity = activities.value.find(({ id }) => id === activityId);
-  await activityService.update(activity);
-  search();
-}
-
 async function stopActivity(activityId) {
   const activity = activities.value.find(({ id }) => id === activityId);
-  activity.endDate = Date.now();
+  activity.endDate = sanitizeDate(Date.now());
   await activityService.update(activity);
   search();
 }
@@ -128,7 +121,7 @@ async function restartActivity(activityId) {
   await activityService.create({
     ...activity,
     id: undefined,
-    startDate: Date.now(),
+    startDate: sanitizeDate(Date.now()),
     endDate: undefined,
     tags: activity.tags.map(({ id }) => id),
   });

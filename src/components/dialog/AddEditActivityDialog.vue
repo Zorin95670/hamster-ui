@@ -24,8 +24,15 @@
             type="textarea"
           />
           <date-time-input
+            :label="$t(`${edit ? 'Edit' : 'Add'}ActivityDialog.startDate`)"
             v-model="startDate"
             class="q-my-md"
+          />
+          <date-time-input
+            :label="$t(`${edit ? 'Edit' : 'Add'}ActivityDialog.endDate`)"
+            v-model="endDate"
+            class="q-my-md"
+            v-if="edit"
           />
           <tag-select v-model="tags"/>
         </q-card-section>
@@ -60,18 +67,20 @@ import TagSelect from 'components/select/TagSelect.vue';
 import * as TagService from 'src/services/TagService';
 import * as ActivityService from 'src/services/ActivityService';
 import Events from 'src/composables/Events';
+import { sanitizeDate } from 'src/composables/Sanitize';
 
 const submitting = ref(false);
 const name = ref(null);
 const description = ref(null);
 const link = ref(null);
 const startDate = ref(null);
+const endDate = ref(null);
 const tags = ref([]);
 const edit = ref(false);
 let activity = null;
 let lastActivity;
 const { show } = useDialog('add-edit-activity', (event) => {
-  startDate.value = Date.now();
+  startDate.value = sanitizeDate(Date.now());
   submitting.value = false;
   lastActivity = event.last;
   edit.value = event.edit;
@@ -82,6 +91,7 @@ const { show } = useDialog('add-edit-activity', (event) => {
     description.value = event.activity.description;
     link.value = event.activity.link;
     startDate.value = event.activity.startDate;
+    endDate.value = event.activity.endDate;
     tags.value = event.activity.tags;
   }
 });
@@ -93,7 +103,7 @@ async function onSubmit() {
     name: name.value,
     description: description.value,
     link: link.value,
-    startDate: startDate.value,
+    startDate: sanitizeDate(startDate.value),
     tags: (await Promise.allSettled(
       tags.value.map((tag) => {
         if (tag.id) {
@@ -107,6 +117,7 @@ async function onSubmit() {
   if (edit.value) {
     act.id = activity.id;
     act.tags = act.tags.map(({ value }) => value);
+    act.endDate = sanitizeDate(endDate.value);
     await ActivityService.update(act);
   } else {
     act.tags = act.tags.map(({ value }) => value.id);
@@ -114,7 +125,7 @@ async function onSubmit() {
   }
 
   if (!edit.value && lastActivity) {
-    lastActivity.endDate = Date.now();
+    lastActivity.endDate = sanitizeDate(Date.now());
     await ActivityService.update(lastActivity);
   }
 

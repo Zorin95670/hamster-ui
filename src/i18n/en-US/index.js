@@ -7,6 +7,8 @@ export default {
     add: 'Start',
     cancel: 'Cancel',
     emptyName: 'Name cannot be empty.',
+    startDate: 'Start date',
+    endDate: 'End date',
   },
   EditActivityDialog: {
     title: 'Edit activity',
@@ -16,6 +18,8 @@ export default {
     add: 'Update',
     cancel: 'Cancel',
     emptyName: 'Name cannot be empty.',
+    startDate: 'Start date',
+    endDate: 'End date',
   },
   DateFilterSelect: {
     filter: 'Filter date:',
