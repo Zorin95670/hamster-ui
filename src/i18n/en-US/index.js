@@ -21,6 +21,10 @@ export default {
     startDate: 'Start date',
     endDate: 'End date',
   },
+  TodayChart: {
+    nameTitle: 'Time by activity name',
+    tagTitle: 'Time by activity tag',
+  },
   DateFilterSelect: {
     filter: 'Filter date:',
     filterMonth: 'Select month',

@@ -35,30 +35,47 @@
       </q-card-section>
     </q-card>
     <activity-list
-      style="max-width: 800px;"
+      style="max-width: 800px;width: 800px"
       :activities="activities"
       @edit="openAddActivityDialog"
       @stop="stopActivity"
       @remove="openRemoveActivityDialog"
       @restart="restartActivity"
     />
+    <today-chart
+      style="max-width: 800px;width: 800px"
+      class="q-mt-md"
+      :activities="currentActivities"
+    />
   </q-page>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue';
+import {
+  computed,
+  onMounted,
+  onUnmounted,
+  ref,
+} from 'vue';
 import TagSelect from 'components/select/TagSelect.vue';
 import * as activityService from 'src/services/ActivityService.js';
 import Events from 'src/composables/Events';
 import DayTrackingImage from 'components/image/DayTrackingImage.vue';
 import ActivityList from 'components/list/ActivityList.vue';
 import { sanitizeDate } from 'src/composables/Sanitize';
+import TodayChart from 'components/chart/TodayChart.vue';
+import moment from 'moment';
 
 const activities = ref([]);
 const loading = ref(true);
 const filterName = ref(null);
 const filterTags = ref([]);
 const filters = {};
+const currentActivities = computed(() => activities.value
+  .filter(({ startDate }) => moment(startDate)
+    .startOf('day')
+    .unix() === moment(Date.now())
+    .startOf('day').unix()));
 
 let reloadEventSubscription;
 
@@ -66,6 +83,7 @@ function search() {
   loading.value = true;
   filters.order = 'startDate';
   filters.sort = 'desc';
+  filters.count = 50;
 
   activityService.find(filters)
     .then((response) => {
